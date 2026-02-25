@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Tablet Demon Hunter</title>
+
+<style>
+body{
+  font-family: 'Segoe UI', sans-serif; text-align: center; background: url('qil3.png') center/cover no-repeat fixed; padding: 20px; color:#FFFFFF; display:flex; justify-content:center; align-items:flex-end; min-height:100vh; position:relative; }
+
+/* LAYAR */
+.screen{
+  display:none;              /* SEMUA layar disembunyikan dulu */
+  position:fixed;
+  inset:0;
+  padding:20px;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+.active{
+  display:flex;              /* HANYA layar aktif yang muncul */
+}
+
+/* POSISI BAWAH */
+.bottom{
+  position:absolute;
+  bottom:20px;
+}
+
+/* TOMBOL */
+button{
+  padding:12px 18px;
+  margin:8px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#ff512f,#dd2476);
+  color:white;
+}
+
+.option{
+  display:block;
+  width:100%;
+  max-width:400px;
+}
+
+/* WARNA JAWABAN */
+.correct{ background:#2ecc71 !important; }
+.wrong{ background:#e74c3c !important; }
+
+/* KARAKTER */
+.character{
+  position:absolute;
+  bottom:90px;
+  left:30%;
+  transform:translateX(-50%);
+  height:290px;
+  opacity:0.7;
+  pointer-events:none;
+}
+
+/* HUJAN BINTANG */
+.star{
+  position:fixed;
+  top:-20px;
+  font-size:20px;
+  animation:fall linear forwards;
+  z-index:9999;
+}
+
+@keyframes fall{
+  to{ transform:translateY(110vh); opacity:0; }
+}
+
+/* ADMIN BOLEH SCROLL */
+#admin{ overflow:auto; }
+
+/* ICON GEAR */
+#gear{
+  position:fixed;
+  top:10px;
+  right:10px;
+  font-size:22px;
+  cursor:pointer;
+  z-index:1000;
+}
+#admin{
+  display:none;                 /* tetap ikut sistem screen */
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;   /* mulai dari atas */
+  padding:25px 15px 40px;
+  overflow-y:auto;
+  background: radial-gradient(circle at top, #1f1f2e, #000);
+}
+
+/* saat aktif */
+#admin.active{
+  display:flex;
+}
+
+/* judul */
+#admin h1{
+  margin-bottom:15px;
+  font-size:26px;
+}
+
+/* semua form */
+#admin input,
+#admin textarea,
+#admin select{
+  width:100%;
+  max-width:420px;
+  margin:6px 0;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #444;
+  background:#111;
+  color:#fff;
+  font-size:15px;
+  box-sizing:border-box;
+}
+
+/* placeholder jelas */
+#admin input::placeholder,
+#admin textarea::placeholder{
+  color:#bbb;
+  opacity:1;
+}
+
+/* tinggi textarea */
+#admin textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+/* tombol */
+#admin button{
+  width:100%;
+  max-width:420px;
+  padding:14px;
+  margin:10px 0;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  background:linear-gradient(135deg,#ff512f,#dd2476);
+  color:white;
+  box-shadow:0 0 10px rgba(255,80,120,0.4);
+}
+
+/* tombol reset merah */
+#admin button[style*="ff3b3b"]{
+  background:linear-gradient(135deg,#ff0000,#b30000);
+}
+/* =========================
+   BACKGROUND LAYAR KUIS
+   ========================= */
+#quiz{
+  background:
+    radial-gradient(circle at center, rgba(40,0,60,0.3), rgba(0,0,0,0.6)),
+    url("bg-demon.jpg");   /* ganti dengan gambar kamu */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* kotak soal supaya kontras */
+#quiz-container{
+  background: rgba(0,0,0,0.65);
+  padding: 18px;
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+  width: 100%;
+}
+
+
+/* =========================
+   UKURAN TOMBOL DIKUNCI
+   ========================= */
+button{
+  width: 100%;
+  max-width: 420px;      /* semua tombol sama lebar */
+  height: 52px;          /* tinggi tetap */
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* tombol pilihan jawaban */
+.option{
+  width: 100%;
+  max-width: 420px;
+  height: 52px;
+  margin: 8px auto;
+  display: block;
+  text-align: center;
+}
+
+/* tombol lanjut & menu bawah */
+.bottom button{
+  width: 160px;          /* ukuran konsisten */
+  height: 48px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gear">⚙️</div>
+
+<!-- MENU -->
+<div id="menu" class="screen active">
+  <img src="character.png" class="character">
+  <h1>Pilih Mata Pelajaran</h1>
+  <div id="subjectButtons" class="bottom"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <img src="character.png" class="character">
+
+  <div id="explainBox" style="display:none;">
+    <h3 id="resultText"></h3>
+    <p id="explanationText"></p>
+    <button onclick="nextQuestion()">Lanjut</button>
+  </div>
+
+  <h2 id="questionText"></h2>
+  <div id="options"></div>
+</div>
+
+<!-- HASIL -->
+<div id="result" class="screen">
+  <img src="character.png" class="character">
+  <h1>Skor Akhir</h1>
+  <h2 id="scoreText"></h2>
+  <h3 id="timeReward"></h3>
+
+  <div class="bottom">
+    <button onclick="startQuiz(currentSubject)">Ulangi</button>
+    <button onclick="showScreen('menu')">Menu</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <h1>Mode Admin</h1>
+
+  <select id="adminSubject"></select><br><br>
+
+  <textarea id="qText" placeholder="Pertanyaan"></textarea><br>
+  <input id="opt1" placeholder="Pilihan 1">
+  <input id="opt2" placeholder="Pilihan 2">
+  <input id="opt3" placeholder="Pilihan 3">
+  <input id="opt4" placeholder="Pilihan 4"><br>
+  <input id="correct" placeholder="Jawaban benar (1-4)">
+  <textarea id="exp" placeholder="Penjelasan"></textarea><br>
+  <button onclick="addQuestion()">Tambah Soal</button><br><br>
+
+  <input type="file" id="importFile">
+  <button onclick="importJSON()">Import JSON</button><br><br>
+
+  <button onclick="resetAllQuestions()" style="background:#ff3b3b">
+    🗑 Reset Semua Soal
+  </button><br><br>
+
+  <button onclick="showScreen('menu')">Kembali</button>
+</div>
+
+<audio id="soundCorrect" src="coret.mp3"></audio>
+<audio id="soundWrong" src="incorrect.mp3"></audio>
+
+<script>
+const subjects=["Pancasila","IPAS","Matematika","Bahasa Indonesia","Bahasa Inggris"];
+
+let currentSubject=null;
+let questions=[];
+let index=0;
+let score=0;
+
+/* PINDAH HALAMAN */
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* MENU */
+function initMenu(){
+  subjects.forEach(sub=>{
+    const b=document.createElement("button");
+    b.textContent=sub;
+    b.onclick=()=>startQuiz(sub);
+    subjectButtons.appendChild(b);
+
+    const o=document.createElement("option");
+    o.textContent=sub;
+    adminSubject.appendChild(o);
+  });
+}
+
+/* STORAGE */
+function getBank(sub){
+  return JSON.parse(localStorage.getItem("quiz_"+sub)||"[]");
+}
+function saveBank(sub,data){
+  localStorage.setItem("quiz_"+sub,JSON.stringify(data));
+}
+
+/* START */
+function startQuiz(sub){
+  currentSubject=sub;
+  questions=getBank(sub).sort(()=>Math.random()-0.5).slice(0,15);
+  index=0;
+  score=0;
+
+  if(questions.length===0){ alert("Belum ada soal!"); return; }
+
+  showScreen("quiz");
+  showQuestion();
+}
+
+/* TAMPIL SOAL */
+function showQuestion(){
+  const q=questions[index];
+  questionText.textContent=q.q;
+  options.innerHTML="";
+  explainBox.style.display="none";
+
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.textContent=opt;
+    b.onclick=()=>answer(i+1);
+    options.appendChild(b);
+  });
+}
+
+/* JAWAB */
+function answer(choice){
+  const q=questions[index];
+  const btns=document.querySelectorAll(".option");
+
+  btns.forEach(b=>b.disabled=true);
+  btns[q.correct-1].classList.add("correct");
+
+  if(choice===q.correct){
+    score++;
+    soundCorrect.play();
+    starRain();
+    resultText.textContent="Benar!";
+  }else{
+    soundWrong.play();
+    btns[choice-1].classList.add("wrong");
+    resultText.textContent="Salah!";
+  }
+
+  explanationText.textContent=q.exp||"";
+  explainBox.style.display="block";
+}
+
+/* LANJUT */
+function nextQuestion(){
+  index++;
+  if(index>=questions.length) return showResult();
+  showQuestion();
+}
+
+/* HASIL */
+function showResult(){
+  const minutes=score*10;
+  scoreText.textContent=score+" dari "+questions.length;
+  timeReward.textContent="Hadiah: "+minutes+" menit bermain tablet";
+  showScreen("result");
+}
+
+/* ADMIN */
+function addQuestion(){
+  const sub=adminSubject.value;
+  const bank=getBank(sub);
+
+  bank.push({
+    q:qText.value,
+    options:[opt1.value,opt2.value,opt3.value,opt4.value],
+    correct:Number(correct.value),
+    exp:exp.value
+  });
+
+  saveBank(sub,bank);
+  alert("Soal ditambahkan!");
+}
+
+function importJSON(){
+  const file=importFile.files[0];
+  if(!file) return;
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=JSON.parse(e.target.result);
+    const sub=adminSubject.value;
+    saveBank(sub,getBank(sub).concat(data));
+    alert("Import berhasil!");
+  };
+  reader.readAsText(file);
+}
+
+function resetAllQuestions(){
+  if(!confirm("Hapus semua soal?")) return;
+  subjects.forEach(s=>localStorage.removeItem("quiz_"+s));
+  alert("Semua soal dihapus.");
+}
+
+/* HUJAN BINTANG */
+function starRain(){
+  for(let i=0;i<20;i++){
+    const star=document.createElement("div");
+    star.className="star";
+    star.textContent="⭐";
+    star.style.left=Math.random()*100+"vw";
+    star.style.animationDuration=(0.8+Math.random())+"s";
+    document.body.appendChild(star);
+    setTimeout(()=>star.remove(),1500);
+  }
+}
+
+/* PASSWORD ADMIN */
+gear.onclick=()=>{
+  if(prompt("Password Admin:")==="1234") showScreen("admin");
+};
+
+initMenu();
+</script>
+
+</body>
+</html>
