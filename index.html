@@ -43,10 +43,23 @@ button{
   color:white;
 }
 
-.option{
-  display:block;
-  width:100%;
-  max-width:400px;
+..option{
+  width: 100%;
+  max-width: 420px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  gap: 8px;
+  height: auto;   /* penting */
+}
+.option img{
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 10px;
 }
 
 /* WARNA JAWABAN */
@@ -187,26 +200,52 @@ button{
    ========================= */
 button{
   width: 100%;
-  max-width: 420px;      /* semua tombol sama lebar */
-  height: 52px;          /* tinggi tetap */
+  max-width: 420px;
   box-sizing: border-box;
   font-size: 16px;
 }
 
 /* tombol pilihan jawaban */
-.option{
-  width: 100%;
-  max-width: 420px;
-  height: 52px;
-  margin: 8px auto;
-  display: block;
-  text-align: center;
+.bottom button{
+  width: 160px;
+  height: 48px;
 }
 
 /* tombol lanjut & menu bawah */
 .bottom button{
   width: 160px;          /* ukuran konsisten */
   height: 48px;
+}
+/* =========================
+   POPUP HASIL FULL LAYAR
+   ========================= */
+#explainBox{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.9);
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+  z-index:9999;
+}
+
+#explainBox h3{
+  font-size:28px;
+  margin-bottom:15px;
+}
+
+#explainBox p{
+  max-width:420px;
+  margin-bottom:20px;
+}
+
+#explainBox button{
+  width:200px;
+  height:50px;
+  font-size:18px;
 }
 </style>
 </head>
@@ -226,11 +265,11 @@ button{
 <div id="quiz" class="screen">
   <img src="character.png" class="character">
 
-  <div id="explainBox" style="display:none;">
-    <h3 id="resultText"></h3>
-    <p id="explanationText"></p>
-    <button onclick="nextQuestion()">Lanjut</button>
-  </div>
+<div id="explainBox">
+  <h3 id="resultText"></h3>
+  <p id="explanationText"></p>
+  <button onclick="nextQuestion()">Lanjut</button>
+</div>
 
   <h2 id="questionText"></h2>
   <div id="options"></div>
@@ -263,9 +302,35 @@ button{
   <input id="correct" placeholder="Jawaban benar (1-4)">
   <textarea id="exp" placeholder="Penjelasan"></textarea><br>
   <button onclick="addQuestion()">Tambah Soal</button><br><br>
+  
+<h3>Tambah Soal Dengan Gambar (Opsional)</h3>
+  <input id="imgSoal" placeholder="URL / nama file gambar soal (opsional)" />
+  <br />
+  <input id="img1" placeholder="Gambar opsi 1 (opsional)" />
+  <input id="img2" placeholder="Gambar opsi 2 (opsional)" />
+  <input id="img3" placeholder="Gambar opsi 3 (opsional)" />
+  <input id="img4" placeholder="Gambar opsi 4 (opsional)" />
+  <br /><br />
+  
+  <hr>
+<hr>
+
+<button onclick="toggleQuestionList()" style="background:#6c5ce7">
+  📂 Tampilkan Soal Mapel Ini
+</button>
+
+<div id="questionArea" style="display:none; width:100%; max-width:420px;">
+  <h3>Daftar Soal Mapel Ini</h3>
+  <div id="questionCount"></div>
+  <div id="questionList"></div>
+</div>
 
   <input type="file" id="importFile">
   <button onclick="importJSON()">Import JSON</button><br><br>
+  
+  <button onclick="deleteBySubject()" style="background:#ff8800">
+  🗑 Hapus Soal Mapel Ini
+</button>
 
   <button onclick="resetAllQuestions()" style="background:#ff3b3b">
     🗑 Reset Semua Soal
@@ -278,7 +343,7 @@ button{
 <audio id="soundWrong" src="incorrect.mp3"></audio>
 
 <script>
-const subjects=["Pancasila","IPAS","Matematika","Bahasa Indonesia","Bahasa Inggris"];
+const subjects=["Pancasila","IPAS","Matematika","Bahasa Indonesia","Bahasa Inggris","tes"];
 
 let currentSubject=null;
 let questions=[];
@@ -328,24 +393,52 @@ function startQuiz(sub){
 
 /* TAMPIL SOAL */
 function showQuestion(){
-  const q=questions[index];
-  questionText.textContent=q.q;
-  options.innerHTML="";
-  explainBox.style.display="none";
+  const q = questions[index];
+
+  questionText.innerHTML = "";
+  options.innerHTML = "";
+  explainBox.style.display = "none";
+
+  questionText.textContent = q.q;
+
+  if(q.img){
+    const img = document.createElement("img");
+    img.src = q.img;
+    img.style.maxWidth = "90px";
+    img.style.display = "block";
+    img.style.margin = "10px auto";
+    questionText.appendChild(img);
+  }
 
   q.options.forEach((opt,i)=>{
-    const b=document.createElement("button");
-    b.className="option";
-    b.textContent=opt;
-    b.onclick=()=>answer(i+1);
+    const b = document.createElement("button");
+    b.className = "option";
+
+    if(typeof opt === "object"){
+      if(opt.img){
+        const img = document.createElement("img");
+        img.src = opt.img;
+        b.appendChild(img);
+      }
+      if(opt.text){
+        const span = document.createElement("span");
+        span.textContent = opt.text;
+        b.appendChild(span);
+      }
+    } else {
+      b.textContent = opt;
+    }
+
+    b.onclick = ()=>answer(i+1);
     options.appendChild(b);
   });
 }
 
+
 /* JAWAB */
 function answer(choice){
-  const q=questions[index];
-  const btns=document.querySelectorAll(".option");
+  const q = questions[index];
+  const btns = document.querySelectorAll(".option");
 
   btns.forEach(b=>b.disabled=true);
   btns[q.correct-1].classList.add("correct");
@@ -354,15 +447,16 @@ function answer(choice){
     score++;
     soundCorrect.play();
     starRain();
-    resultText.textContent="Benar!";
+    resultText.textContent="🎉 BENAR!";
   }else{
     soundWrong.play();
     btns[choice-1].classList.add("wrong");
-    resultText.textContent="Salah!";
+    resultText.textContent="❌ SALAH!";
   }
 
-  explanationText.textContent=q.exp||"";
-  explainBox.style.display="block";
+  explanationText.textContent = q.exp || "Tidak ada penjelasan.";
+
+  explainBox.style.display="flex";   // tampil full layar
 }
 
 /* LANJUT */
@@ -374,7 +468,7 @@ function nextQuestion(){
 
 /* HASIL */
 function showResult(){
-  const minutes=score*10;
+  const minutes=score*5;
   scoreText.textContent=score+" dari "+questions.length;
   timeReward.textContent="Hadiah: "+minutes+" menit bermain tablet";
   showScreen("result");
@@ -382,20 +476,119 @@ function showResult(){
 
 /* ADMIN */
 function addQuestion(){
-  const sub=adminSubject.value;
-  const bank=getBank(sub);
+  const sub = adminSubject.value;
+  const bank = getBank(sub);
 
-  bank.push({
-    q:qText.value,
-    options:[opt1.value,opt2.value,opt3.value,opt4.value],
-    correct:Number(correct.value),
-    exp:exp.value
-  });
+  const newData = {
+    q: qText.value,
+    img: imgSoal.value || null,
+    options: [
+      { text: opt1.value, img: img1.value || null },
+      { text: opt2.value, img: img2.value || null },
+      { text: opt3.value, img: img3.value || null },
+      { text: opt4.value, img: img4.value || null }
+    ],
+    correct: Number(correct.value),
+    exp: exp.value
+  };
+
+  if(editingIndex !== null){
+    bank[editingIndex] = newData;
+    editingIndex = null;
+    alert("Soal berhasil diupdate!");
+  } else {
+    bank.push(newData);
+    alert("Soal ditambahkan!");
+  }
 
   saveBank(sub,bank);
-  alert("Soal ditambahkan!");
+  renderQuestionList();
 }
 
+function renderQuestionList(){
+  const sub = adminSubject.value;
+  const bank = getBank(sub);
+
+  questionCount.textContent = "Jumlah soal: " + bank.length;
+  questionList.innerHTML = "";
+
+  bank.forEach((q,i)=>{
+    const box = document.createElement("div");
+    box.style.background = "#111";
+    box.style.padding = "10px";
+    box.style.margin = "10px 0";
+    box.style.borderRadius = "10px";
+    box.style.textAlign = "left";
+
+    const title = document.createElement("div");
+    title.textContent = (i+1)+". "+q.q;
+    title.style.fontWeight = "bold";
+    box.appendChild(title);
+
+    // tombol edit
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏ Edit";
+    editBtn.style.background = "#3498db";
+    editBtn.onclick = ()=>loadQuestionToForm(i);
+    box.appendChild(editBtn);
+
+    // tombol hapus
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "❌ Hapus";
+    delBtn.style.background = "#e74c3c";
+    delBtn.onclick = ()=>deleteSingleQuestion(i);
+    box.appendChild(delBtn);
+
+    questionList.appendChild(box);
+  });
+}
+function deleteSingleQuestion(index){
+  const sub = adminSubject.value;
+  const bank = getBank(sub);
+
+  if(!confirm("Hapus soal ini?")) return;
+
+  bank.splice(index,1);
+  saveBank(sub,bank);
+  renderQuestionList();
+}
+let editingIndex = null;
+
+function loadQuestionToForm(index){
+  const sub = adminSubject.value;
+  const bank = getBank(sub);
+  const q = bank[index];
+
+  qText.value = q.q;
+  opt1.value = q.options[0]?.text || q.options[0];
+  opt2.value = q.options[1]?.text || q.options[1];
+  opt3.value = q.options[2]?.text || q.options[2];
+  opt4.value = q.options[3]?.text || q.options[3];
+
+  imgSoal.value = q.img || "";
+  img1.value = q.options[0]?.img || "";
+  img2.value = q.options[1]?.img || "";
+  img3.value = q.options[2]?.img || "";
+  img4.value = q.options[3]?.img || "";
+
+  correct.value = q.correct;
+  exp.value = q.exp || "";
+
+  editingIndex = index;
+}
+function toggleQuestionList(){
+  const area = document.getElementById("questionArea");
+  const btn = event.target;
+
+  if(area.style.display === "none"){
+    area.style.display = "block";
+    btn.textContent = "📂 Sembunyikan Soal Mapel Ini";
+    renderQuestionList();
+  }else{
+    area.style.display = "none";
+    btn.textContent = "📂 Tampilkan Soal Mapel Ini";
+  }
+}
 function importJSON(){
   const file=importFile.files[0];
   if(!file) return;
@@ -408,6 +601,16 @@ function importJSON(){
     alert("Import berhasil!");
   };
   reader.readAsText(file);
+}
+
+function deleteBySubject(){
+  const sub = adminSubject.value;
+
+  if(!confirm("Hapus semua soal untuk mapel: " + sub + " ?")) return;
+
+  localStorage.removeItem("quiz_" + sub);
+
+  alert("Semua soal mapel " + sub + " berhasil dihapus.");
 }
 
 function resetAllQuestions(){
@@ -434,6 +637,8 @@ gear.onclick=()=>{
   if(prompt("Password Admin:")==="1234") showScreen("admin");
 };
 
+adminSubject.onchange = renderQuestionList;
+renderQuestionList();
 initMenu();
 </script>
 
