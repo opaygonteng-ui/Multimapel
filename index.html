@@ -7,9 +7,9 @@
 
 <style>
 body{
-  font-family: 'Segoe UI', sans-serif; text-align: center; background: url('qil.png') center/cover no-repeat fixed; padding: 20px; color:#FFFFFF; display:flex; justify-content:center; align-items:flex-end; min-height:100vh; position:relative; }
+ font-family: 'Segoe UI', sans-serif; text-align: center; background: url('qil.png') center/cover no-repeat fixed; padding: 20px; color:#FFFFFF; display:flex; justify-content:center; align-items:flex-end; min-height:100vh; position:relative; }
 
-/* LAYAR */
+
 .screen{
   display:none;              
   position:fixed;
@@ -22,16 +22,14 @@ body{
 }
 
 .active{
-  display:flex;              /* HANYA layar aktif yang muncul */
+  display:flex;             
 }
 
-/* POSISI BAWAH */
 .bottom{
   position:absolute;
   bottom:20px;
 }
 
-/* TOMBOL */
 button{
   padding:12px 18px;
   margin:8px;
@@ -43,7 +41,7 @@ button{
   color:white;
 }
 
-..option{
+.option{
   width: 100%;
   max-width: 420px;
   margin: 10px auto;
@@ -53,7 +51,7 @@ button{
   justify-content: center;
   padding: 12px;
   gap: 8px;
-  height: auto;   /* penting */
+  height: auto;   
 }
 .option img{
   max-width: 120px;
@@ -62,11 +60,9 @@ button{
   border-radius: 10px;
 }
 
-/* WARNA JAWABAN */
 .correct{ background:#2ecc71 !important; }
 .wrong{ background:#e74c3c !important; }
 
-/* KARAKTER */
 .character{
   position:absolute;
   bottom:90px;
@@ -77,7 +73,6 @@ button{
   pointer-events:none;
 }
 
-/* HUJAN BINTANG */
 .star{
   position:fixed;
   top:-20px;
@@ -90,7 +85,6 @@ button{
   to{ transform:translateY(110vh); opacity:0; }
 }
 
-/* ADMIN BOLEH SCROLL */
 #admin{ overflow:auto; }
 
 /* ICON GEAR */
@@ -112,18 +106,16 @@ button{
   background: radial-gradient(circle at top, #1f1f2e, #000);
 }
 
-/* saat aktif */
 #admin.active{
   display:flex;
 }
 
-/* judul */
 #admin h1{
   margin-bottom:15px;
   font-size:26px;
 }
 
-/* semua form */
+
 #admin input,
 #admin textarea,
 #admin select{
@@ -139,20 +131,17 @@ button{
   box-sizing:border-box;
 }
 
-/* placeholder jelas */
 #admin input::placeholder,
 #admin textarea::placeholder{
   color:#bbb;
   opacity:1;
 }
 
-/* tinggi textarea */
 #admin textarea{
   min-height:80px;
   resize:vertical;
 }
 
-/* tombol */
 #admin button{
   width:100%;
   max-width:420px;
@@ -168,13 +157,9 @@ button{
   box-shadow:0 0 10px rgba(255,80,120,0.4);
 }
 
-/* tombol reset merah */
 #admin button[style*="ff3b3b"]{
   background:linear-gradient(135deg,#ff0000,#b30000);
 }
-/* =========================
-   BACKGROUND LAYAR KUIS
-   ========================= */
 #quiz{
   background:
     radial-gradient(circle at center, rgba(40,0,60,0.3), rgba(0,0,0,0.6)),
@@ -184,7 +169,7 @@ button{
   background-repeat: no-repeat;
 }
 
-/* kotak soal supaya kontras */
+
 #quiz-container{
   background: rgba(0,0,0,0.65);
   padding: 18px;
@@ -195,9 +180,6 @@ button{
 }
 
 
-/* =========================
-   UKURAN TOMBOL DIKUNCI
-   ========================= */
 button{
   width: 100%;
   max-width: 420px;
@@ -205,20 +187,16 @@ button{
   font-size: 16px;
 }
 
-/* tombol pilihan jawaban */
 .bottom button{
   width: 160px;
   height: 48px;
 }
 
-/* tombol lanjut & menu bawah */
 .bottom button{
-  width: 160px;          /* ukuran konsisten */
+  width: 160px;          
   height: 48px;
 }
-/* =========================
-   POPUP HASIL FULL LAYAR
-   ========================= */
+
 #explainBox{
   position:fixed;
   inset:0;
