@@ -7,11 +7,10 @@
 
 <style>
 body{
- font-family: 'Segoe UI', sans-serif; text-align: center; background: url('qil.png') center/cover no-repeat fixed; padding: 20px; color:#FFFFFF; display:flex; justify-content:center; align-items:flex-end; min-height:100vh; position:relative; }
-
+  font-family: 'Segoe UI', sans-serif; text-align: center; background: url('dp.jpg') center/cover no-repeat fixed; padding: 20px; color:#FFFFFF; display:flex; justify-content:center; align-items:flex-end; min-height:100vh; position:relative; }
 
 .screen{
-  display:none;              
+  display:none;     
   position:fixed;
   inset:0;
   padding:20px;
@@ -22,7 +21,24 @@ body{
 }
 
 .active{
-  display:flex;             
+  display:flex;
+}
+
+.top-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 280px;
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+.top-container button {
+  margin: 0;
+  width: 100%;
+  height: 48px;
 }
 
 .bottom{
@@ -37,8 +53,11 @@ button{
   border-radius:12px;
   font-size:16px;
   cursor:pointer;
-  background:linear-gradient(135deg,#ff512f,#dd2476);
-  color:white;
+  background: linear-gradient(135deg, #2d1b4e, #1a0b2e);
+  border: 1px solid #7a0d0d; 
+  color: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .option{
@@ -51,7 +70,7 @@ button{
   justify-content: center;
   padding: 12px;
   gap: 8px;
-  height: auto;   
+  height: auto;   /* penting */
 }
 .option img{
   max-width: 120px;
@@ -60,18 +79,21 @@ button{
   border-radius: 10px;
 }
 
+
 .correct{ background:#2ecc71 !important; }
 .wrong{ background:#e74c3c !important; }
 
 .character{
   position:absolute;
-  bottom:90px;
-  left:30%;
+  bottom:50px;
+  left:50%;
   transform:translateX(-50%);
-  height:290px;
-  opacity:0.7;
+  height:350px;
+  opacity:100;
   pointer-events:none;
+  z-index: -1;
 }
+
 
 .star{
   position:fixed;
@@ -85,9 +107,10 @@ button{
   to{ transform:translateY(110vh); opacity:0; }
 }
 
+
 #admin{ overflow:auto; }
 
-/* ICON GEAR */
+
 #gear{
   position:fixed;
   top:10px;
@@ -97,7 +120,7 @@ button{
   z-index:1000;
 }
 #admin{
-  display:none;                 /* tetap ikut sistem screen */
+  display:none;    
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;   /* mulai dari atas */
@@ -106,15 +129,16 @@ button{
   background: radial-gradient(circle at top, #1f1f2e, #000);
 }
 
+
 #admin.active{
   display:flex;
 }
+
 
 #admin h1{
   margin-bottom:15px;
   font-size:26px;
 }
-
 
 #admin input,
 #admin textarea,
@@ -130,6 +154,7 @@ button{
   font-size:15px;
   box-sizing:border-box;
 }
+
 
 #admin input::placeholder,
 #admin textarea::placeholder{
@@ -163,12 +188,11 @@ button{
 #quiz{
   background:
     radial-gradient(circle at center, rgba(40,0,60,0.3), rgba(0,0,0,0.6)),
-    url("bg-demon.jpg");   /* ganti dengan gambar kamu */
+    url("bg-demon.jpg");  
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-
 
 #quiz-container{
   background: rgba(0,0,0,0.65);
@@ -179,7 +203,6 @@ button{
   width: 100%;
 }
 
-
 button{
   width: 100%;
   max-width: 420px;
@@ -187,13 +210,15 @@ button{
   font-size: 16px;
 }
 
+
 .bottom button{
   width: 160px;
   height: 48px;
 }
 
+
 .bottom button{
-  width: 160px;          
+  width: 160px;
   height: 48px;
 }
 
@@ -232,18 +257,13 @@ button{
 
 <div id="gear">⚙️</div>
 
-<!-- MENU -->
 <div id="menu" class="screen active">
   <img src="character.png" class="character">
-  <h1>Pilih Mata Pelajaran</h1>
-  <div id="subjectButtons" class="bottom"></div>
+  <div id="subjectButtons" class="top-container"></div>
 </div>
 
-<!-- QUIZ -->
 <div id="quiz" class="screen">
-  <img src="character.png" class="character">
-
-<div id="explainBox">
+  <div id="explainBox">
   <h3 id="resultText"></h3>
   <p id="explanationText"></p>
   <button onclick="nextQuestion()">Lanjut</button>
@@ -253,7 +273,6 @@ button{
   <div id="options"></div>
 </div>
 
-<!-- HASIL -->
 <div id="result" class="screen">
   <img src="character.png" class="character">
   <h1>Skor Akhir</h1>
@@ -266,7 +285,6 @@ button{
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="admin" class="screen">
   <h1>Mode Admin</h1>
 
@@ -321,7 +339,7 @@ button{
 <audio id="soundWrong" src="incorrect.mp3"></audio>
 
 <script>
-const subjects=["Pancasila","IPAS","Matematika","Bahasa Indonesia","Bahasa Inggris","Agama"];
+const subjects=["Pancasila","IPAS","Matematika","Bahasa Indonesia","Bahasa Inggris","tes"];
 
 let currentSubject=null;
 let questions=[];
@@ -336,6 +354,7 @@ function showScreen(id){
 
 /* MENU */
 function initMenu(){
+  subjectButtons.innerHTML = ""; // Bersihkan isi container sebelum merender ulang tombol mata pelajaran
   subjects.forEach(sub=>{
     const b=document.createElement("button");
     b.textContent=sub;
